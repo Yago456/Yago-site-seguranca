@@ -1,270 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerador de Senhas Seguras</title>
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
-
-body{
-    background:#121212;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    padding:20px;
-}
-
-.container{
-    background:#1e1e1e;
-    padding:25px;
-    border-radius:15px;
-    width:100%;
-    max-width:500px;
-    box-shadow:0 0 20px rgba(0,0,0,.4);
-}
-
-h1{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-.password-box{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
-}
-
-.password-box input{
-    flex:1;
-    padding:12px;
-    border:none;
-    border-radius:8px;
-    background:#2d2d2d;
-    color:white;
-    font-size:16px;
-}
-
-button{
-    cursor:pointer;
-    border:none;
-    border-radius:8px;
-    padding:12px;
-    background:#4caf50;
-    color:white;
-    font-weight:bold;
-}
-
-button:hover{
-    opacity:.9;
-}
-
-.options{
-    margin:15px 0;
-}
-
-.option{
-    display:flex;
-    justify-content:space-between;
-    margin:10px 0;
-}
-
-input[type="range"]{
-    width:100%;
-}
-
-.generate{
-    width:100%;
-    margin-top:15px;
-    font-size:16px;
-}
-
-.strength{
-    margin-top:15px;
-}
-
-.bar{
-    height:10px;
-    border-radius:10px;
-    margin-top:5px;
-    background:#333;
-    overflow:hidden;
-}
-
-.fill{
-    height:100%;
-    width:0%;
-    transition:.3s;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Senhas Seguras</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
+    <h1>🔐 Gerador de Senhas Seguras</h1>
 
-<h1>🔐 Gerador de Senhas</h1>
-
-<div class="password-box">
-    <input type="text" id="password" readonly>
-    <button onclick="copiarSenha()">Copiar</button>
-</div>
-
-<label>Tamanho: <span id="lengthValue">16</span></label>
-<input type="range" min="8" max="64" value="16" id="length">
-
-<div class="options">
-    <div class="option">
-        <label>Maiúsculas</label>
-        <input type="checkbox" id="upper" checked>
+    <div class="senha-box">
+        <input type="text" id="senha" readonly>
+        <button id="copiar">Copiar</button>
     </div>
 
-    <div class="option">
-        <label>Minúsculas</label>
-        <input type="checkbox" id="lower" checked>
+    <label>
+        Tamanho:
+        <span id="tamanhoValor">16</span>
+    </label>
+
+    <input type="range" id="tamanho" min="8" max="64" value="16">
+
+    <div class="opcoes">
+        <label><input type="checkbox" id="maiusculas" checked> Maiúsculas</label>
+        <label><input type="checkbox" id="minusculas" checked> Minúsculas</label>
+        <label><input type="checkbox" id="numeros" checked> Números</label>
+        <label><input type="checkbox" id="simbolos" checked> Símbolos</label>
     </div>
 
-    <div class="option">
-        <label>Números</label>
-        <input type="checkbox" id="numbers" checked>
-    </div>
+    <button id="gerar">Gerar Senha</button>
 
-    <div class="option">
-        <label>Símbolos</label>
-        <input type="checkbox" id="symbols" checked>
+    <div class="forca">
+        <p id="textoForca">Força: Forte</p>
+        <div class="barra">
+            <div id="nivel"></div>
+        </div>
     </div>
 </div>
 
-<button class="generate" onclick="gerarSenha()">
-Gerar Senha
-</button>
-
-<div class="strength">
-    <p id="strengthText">Força: -</p>
-    <div class="bar">
-        <div class="fill" id="strengthFill"></div>
-    </div>
-</div>
-
-</div>
-
-<script>
-const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const lower = "abcdefghijklmnopqrstuvwxyz";
-const numbers = "0123456789";
-const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-
-document.getElementById("length").addEventListener("input", e=>{
-    document.getElementById("lengthValue").textContent = e.target.value;
-});
-
-function randomIndex(max){
-    const array = new Uint32Array(1);
-    crypto.getRandomValues(array);
-    return array[0] % max;
-}
-
-function gerarSenha(){
-
-    const length = Number(document.getElementById("length").value);
-
-    let charset = "";
-    let required = [];
-
-    if(document.getElementById("upper").checked){
-        charset += upper;
-        required.push(upper[randomIndex(upper.length)]);
-    }
-
-    if(document.getElementById("lower").checked){
-        charset += lower;
-        required.push(lower[randomIndex(lower.length)]);
-    }
-
-    if(document.getElementById("numbers").checked){
-        charset += numbers;
-        required.push(numbers[randomIndex(numbers.length)]);
-    }
-
-    if(document.getElementById("symbols").checked){
-        charset += symbols;
-        required.push(symbols[randomIndex(symbols.length)]);
-    }
-
-    if(charset.length === 0){
-        alert("Selecione pelo menos uma opção.");
-        return;
-    }
-
-    let senha = [...required];
-
-    while(senha.length < length){
-        senha.push(charset[randomIndex(charset.length)]);
-    }
-
-    for(let i = senha.length - 1; i > 0; i--){
-        const j = randomIndex(i + 1);
-        [senha[i], senha[j]] = [senha[j], senha[i]];
-    }
-
-    senha = senha.join("");
-
-    document.getElementById("password").value = senha;
-
-    avaliarForca(senha);
-}
-
-function avaliarForca(senha){
-
-    let score = 0;
-
-    if(senha.length >= 12) score++;
-    if(senha.length >= 16) score++;
-    if(/[A-Z]/.test(senha)) score++;
-    if(/[a-z]/.test(senha)) score++;
-    if(/[0-9]/.test(senha)) score++;
-    if(/[^A-Za-z0-9]/.test(senha)) score++;
-
-    const fill = document.getElementById("strengthFill");
-    const text = document.getElementById("strengthText");
-
-    if(score <= 2){
-        fill.style.width = "25%";
-        fill.style.background = "#f44336";
-        text.textContent = "Força: Fraca";
-    }
-    else if(score <= 4){
-        fill.style.width = "60%";
-        fill.style.background = "#ff9800";
-        text.textContent = "Força: Média";
-    }
-    else{
-        fill.style.width = "100%";
-        fill.style.background = "#4caf50";
-        text.textContent = "Força: Forte";
-    }
-}
-
-async function copiarSenha(){
-
-    const senha = document.getElementById("password").value;
-
-    if(!senha) return;
-
-    await navigator.clipboard.writeText(senha);
-
-    alert("Senha copiada!");
-}
-
-gerarSenha();
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
